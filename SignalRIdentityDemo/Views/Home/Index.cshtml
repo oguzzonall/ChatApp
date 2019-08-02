@@ -1,0 +1,168 @@
+﻿@using Microsoft.AspNet.Identity;
+@model List<SignalRIdentityDemo.Models.ChatMessage>
+
+@{
+    ViewBag.Title = "Home Page";
+}
+<h1 id="titleName">Hoş Geldiniz @User.Identity.Name</h1>
+@*<button id="btnSend">Send Message</button><hr />*@
+@*<ul id="chatList"></ul>*@
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <span class="glyphicon glyphicon-comment"></span> Chat
+                    <div class="btn-group pull-right">
+                        <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                            <span class="glyphicon glyphicon-chevron-down"></span>
+                        </button>
+                        <ul class="dropdown-menu slidedown">
+                            <li>
+                                <a href="http://www.jquery2dotnet.com">
+                                    <span class="glyphicon glyphicon-refresh">
+                                    </span>Refresh
+                                </a>
+                            </li>
+                            <li>
+                                <a href="http://www.jquery2dotnet.com">
+                                    <span class="glyphicon glyphicon-ok-sign">
+                                    </span>Available
+                                </a>
+                            </li>
+                            <li>
+                                <a href="http://www.jquery2dotnet.com">
+                                    <span class="glyphicon glyphicon-remove">
+                                    </span>Busy
+                                </a>
+                            </li>
+                            <li>
+                                <a href="http://www.jquery2dotnet.com">
+                                    <span class="glyphicon glyphicon-time"></span>
+                                    Away
+                                </a>
+                            </li>
+                            <li class="divider"></li>
+                            <li>
+                                <a href="http://www.jquery2dotnet.com">
+                                    <span class="glyphicon glyphicon-off"></span>
+                                    Sign Out
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <ul id="chat" class="chat">
+                        @if (Model != null)
+                        {
+                            foreach (var item in Model)
+                            {
+                                if (User.Identity.Name == item.AspNetUser.UserName && User.Identity.GetUserId() == item.UserId.ToString())
+                                {
+                                    <li class="right clearfix">
+                                        <span class="chat-img pull-right">
+                                            <img src="http://placehold.it/50/FA6F57/fff&text=ME" alt="User Avatar" class="img-circle" />
+                                        </span>
+                                        <div class="chat-body clearfix">
+                                            <div class="header">
+                                                <small class=" text-muted"><span class="glyphicon glyphicon-time"></span>@item.Date.ToString()</small>
+                                                <strong class="pull-right primary-font">@item.AspNetUser.UserName</strong>
+                                            </div>
+                                            <p>
+                                                @item.Message
+                                            </p>
+                                        </div>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="left clearfix">
+                                        <span class="chat-img pull-left">
+                                            <img src="http://placehold.it/50/55C1E7/fff&text=U" alt="User Avatar" class="img-circle" />
+                                        </span>
+                                        <div class="chat-body clearfix">
+                                            <div class="header">
+                                                <strong class="primary-font">@item.AspNetUser.UserName</strong> <small class="pull-right text-muted">
+                                                    <span class="glyphicon glyphicon-time"></span>@item.Date
+                                                </small>
+                                            </div>
+                                            <p>
+                                                @item.Message
+                                            </p>
+                                        </div>
+                                    </li>
+                                }
+                            }
+                        }
+                    </ul>
+                </div>
+                <div class="panel-footer">
+                    <div class="input-group">
+                        <input id="txtMessage" type="text" class="form-control input-sm" placeholder="Type your message here..." />
+                        <span class="input-group-btn">
+                            <button class="btn btn-warning btn-sm" id="btnSend">
+                                Send
+                            </button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<h2> Online Kullanıcılar</h2>
+<ul id="onlineusers"></ul>
+
+
+@section scripts{
+
+    <script src="~/Scripts/jquery.signalR-2.2.0.min.js"></script>
+    <script src="~/signalr/hubs"></script>
+    <script>
+        $(document).ready(function () {
+            $(".panel-body").animate({ scrollTop: $(document).height() }, "fast");
+            var chat = $.connection.chatHub;
+            //$.connection.hub.start();
+
+            $.connection.hub.start();
+
+            chat.client.getMessageOther = function (name, message) {
+                $("#chat").append("<li class='left clearfix'>" + "<span class='chat-img pull-left'>" +
+                    "<img src ='http://placehold.it/50/55C1E7/fff&text=U' alt = 'User Avatar' class='img-circle' />" +
+                    "</span>" + "<div class='chat-body clearfix'>" +
+                    "<div class='header'>" +
+                    "<strong class='primary-font'>" + name + "</strong>" + "<small class='pull-right text-muted'>" +
+                    "<span class='glyphicon glyphicon-time'></span>12 mins ago </small> </div>" +
+                    "<p>" + message + "</p></div></li>");
+                $(".panel-body").animate({ scrollTop: $(document).height() }, "fast");
+            };
+
+            chat.client.getMessageCaller = function (message) {
+                $("#chat").append("<li class='right clearfix'>" + "<span class='chat-img pull-right'>" +
+                    "<img src ='http://placehold.it/50/FA6F57/fff&text=ME' alt = 'User Avatar' class='img-circle' />" +
+                    "</span >" + "<div class='chat-body clearfix'>" +
+                    "<div class='header'>" +
+                    "<strong class='pull-right primary-font'>" + name + "</strong> <small class='text-muted'>" +
+                    "<span class='glyphicon glyphicon-time'></span>12 mins ago </small> </div>" +
+                    "<p>" + message + "</p></div></li>");
+                $(".panel-body").animate({ scrollTop: $(document).height() }, "fast");
+            };
+
+            $("#btnSend").click(function () {
+                var message = $("#txtMessage").val();
+                chat.server.sendMessageAll(message);
+                $("#txtMessage").val("");
+            });
+
+            chat.client.getOnlineUsers = function (list) {
+                $("#onlineusers").html("");
+                list.forEach(function (item) {
+                    $("#onlineusers").append("<li>" + item.UserName + "</li>");
+                });
+            };
+
+        });
+    </script>
+}

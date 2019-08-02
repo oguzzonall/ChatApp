@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="ChatRoomModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityContainer Name="ChatRoomEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="AspNetUsers" EntityType="ChatRoomModel.AspNetUser" />
+    <EntitySet Name="ChatBoxes" EntityType="ChatRoomModel.ChatBox" />
+    <EntitySet Name="ChatMessages" EntityType="ChatRoomModel.ChatMessage" />
+    <AssociationSet Name="FK_ChatMessage_AspNetUsers" Association="ChatRoomModel.FK_ChatMessage_AspNetUsers">
+      <End Role="AspNetUser" EntitySet="AspNetUsers" />
+      <End Role="ChatMessage" EntitySet="ChatMessages" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ChatMessage_AspNetUsers1" Association="ChatRoomModel.FK_ChatMessage_AspNetUsers1">
+      <End Role="AspNetUser" EntitySet="AspNetUsers" />
+      <End Role="ChatMessage" EntitySet="ChatMessages" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ChatMessage_ChatBox" Association="ChatRoomModel.FK_ChatMessage_ChatBox">
+      <End Role="ChatBox" EntitySet="ChatBoxes" />
+      <End Role="ChatMessage" EntitySet="ChatMessages" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="AspNetUser">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+    <Property Name="Email" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+    <Property Name="EmailConfirmed" Type="Boolean" Nullable="false" />
+    <Property Name="PasswordHash" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="SecurityStamp" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="PhoneNumber" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="PhoneNumberConfirmed" Type="Boolean" Nullable="false" />
+    <Property Name="TwoFactorEnabled" Type="Boolean" Nullable="false" />
+    <Property Name="LockoutEndDateUtc" Type="DateTime" Precision="3" />
+    <Property Name="LockoutEnabled" Type="Boolean" Nullable="false" />
+    <Property Name="AccessFailedCount" Type="Int32" Nullable="false" />
+    <Property Name="UserName" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="ChatMessages" Relationship="ChatRoomModel.FK_ChatMessage_AspNetUsers" FromRole="AspNetUser" ToRole="ChatMessage" />
+    <NavigationProperty Name="ChatMessages1" Relationship="ChatRoomModel.FK_ChatMessage_AspNetUsers1" FromRole="AspNetUser" ToRole="ChatMessage" />
+  </EntityType>
+  <EntityType Name="ChatBox">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="SenderID" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+    <Property Name="ReceiverID" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+    <Property Name="CreateDate" Type="DateTime" Nullable="false" Precision="3" />
+    <NavigationProperty Name="ChatMessages" Relationship="ChatRoomModel.FK_ChatMessage_ChatBox" FromRole="ChatBox" ToRole="ChatMessage" />
+  </EntityType>
+  <EntityType Name="ChatMessage">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="ChatBoxID" Type="Int32" />
+    <Property Name="UserId" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+    <Property Name="Message" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+    <Property Name="Date" Type="DateTime" Nullable="false" Precision="3" />
+    <Property Name="ReceiverId" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="AspNetUser" Relationship="ChatRoomModel.FK_ChatMessage_AspNetUsers" FromRole="ChatMessage" ToRole="AspNetUser" />
+    <NavigationProperty Name="AspNetUser1" Relationship="ChatRoomModel.FK_ChatMessage_AspNetUsers1" FromRole="ChatMessage" ToRole="AspNetUser" />
+    <NavigationProperty Name="ChatBox" Relationship="ChatRoomModel.FK_ChatMessage_ChatBox" FromRole="ChatMessage" ToRole="ChatBox" />
+  </EntityType>
+  <Association Name="FK_ChatMessage_AspNetUsers">
+    <End Type="ChatRoomModel.AspNetUser" Role="AspNetUser" Multiplicity="1" />
+    <End Type="ChatRoomModel.ChatMessage" Role="ChatMessage" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="AspNetUser">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="ChatMessage">
+        <PropertyRef Name="UserId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ChatMessage_AspNetUsers1">
+    <End Type="ChatRoomModel.AspNetUser" Role="AspNetUser" Multiplicity="0..1" />
+    <End Type="ChatRoomModel.ChatMessage" Role="ChatMessage" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="AspNetUser">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="ChatMessage">
+        <PropertyRef Name="ReceiverId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ChatMessage_ChatBox">
+    <End Type="ChatRoomModel.ChatBox" Role="ChatBox" Multiplicity="0..1" />
+    <End Type="ChatRoomModel.ChatMessage" Role="ChatMessage" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="ChatBox">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="ChatMessage">
+        <PropertyRef Name="ChatBoxID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema>

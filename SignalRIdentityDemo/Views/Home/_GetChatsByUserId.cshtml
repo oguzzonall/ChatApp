@@ -1,0 +1,40 @@
+﻿@model List<SignalRIdentityDemo.Models.ChatMessage>
+@using Microsoft.AspNet.Identity;
+
+@if (Model != null)
+{
+    foreach (var item in Model)
+    {
+        if (item.ReceiverId == User.Identity.GetUserId().ToString())
+        {
+            <div class="row message-body">
+                <div class="col-sm-12 message-main-receiver">
+                    <div class="receiver">
+                        <div class="message-text">
+                            @item.Message
+                        </div>
+                        <span class="message-time pull-right">
+                            @item.Date.ToShortDateString()
+                        </span>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="row message-body">
+                <div class="col-sm-12 message-main-sender">
+                    <div class="sender">
+                        <div class="message-text">
+                            @item.Message
+                        </div>
+                        <span class="message-time pull-right">
+                            @item.Date
+                        </span>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+}
+
